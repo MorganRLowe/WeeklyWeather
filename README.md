@@ -12,7 +12,7 @@ WeeklyWeather is inspired by [WeatherChecker](https://github.com/ersiver/Weather
 - **Sealed interface UI state** instead of multiple LiveData fields
 - **Single-Activity, screen-state-driven** navigation (no Fragments)
 
-  ![WeeklyWeather demo](./Docs/WeatherChecker.gif)
+<img src="Docs/WeatherChecker.gif" alt="WeeklyWeather demo" width="300"/>
 
 ## Differences from the original
 
