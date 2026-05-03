@@ -1,0 +1,32 @@
+R_DEF: Internal format may change without notice
+local
+color black
+color ic_launcher_background
+color white
+drawable humidity
+drawable ic_launcher_foreground
+drawable ic_location
+drawable ic_search
+drawable icon
+drawable icon_01d
+drawable icon_01n
+drawable icon_02d
+drawable icon_02n
+drawable icon_03
+drawable icon_04
+drawable icon_09
+drawable icon_10d
+drawable icon_10n
+drawable icon_11
+drawable icon_13
+drawable icon_50
+drawable max
+drawable min
+drawable pressure
+drawable wind
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+style Theme.WeeklyWeather
+xml backup_rules
+xml data_extraction_rules
