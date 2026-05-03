@@ -198,41 +198,33 @@ private fun StatsRow(current: CurrentWeather) {
     ) {
         StatColumn(
             iconRes = R.drawable.min,
-            value = current.tempMin.asTempString(),
-            label = "Min"
+            value = current.tempMin.asTempString()
         )
         StatColumn(
             iconRes = R.drawable.max,
-            value = current.tempMax.asTempString(),
-            label = "Max"
+            value = current.tempMax.asTempString()
         )
         StatColumn(
             iconRes = R.drawable.humidity,
-            value = "${current.humidity}%",
-            label = "Humidity"
+            value = "${current.humidity}%"
         )
         StatColumn(
             iconRes = R.drawable.pressure,
-            value = "${current.pressure.toInt()}",
-            label = "hPa"
+            value = "${current.pressure.toInt()} hPa"
         )
         StatColumn(
             iconRes = R.drawable.wind,
-            value = "${current.windSpeed.toInt()}",
-            label = "mph"
+            value = "${current.windSpeed.toInt()} mph"
         )
     }
 }
 
-/**
- * A single icon + value + label column inside the stats row.
- */
 @Composable
-private fun StatColumn(iconRes: Int, value: String, label: String) {
+private fun StatColumn(iconRes: Int, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Image(
             painter = painterResource(iconRes),
-            contentDescription = label,
+            contentDescription = null,
             modifier = Modifier.size(36.dp)
         )
         Spacer(modifier = Modifier.height(6.dp))
@@ -241,12 +233,6 @@ private fun StatColumn(iconRes: Int, value: String, label: String) {
             color = White,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = label,
-            color = White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
         )
     }
 }
