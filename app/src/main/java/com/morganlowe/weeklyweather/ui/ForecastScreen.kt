@@ -4,14 +4,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,42 +30,74 @@ import com.morganlowe.weeklyweather.util.toWeatherDescription
 import com.morganlowe.weeklyweather.util.toWeatherIconRes
 
 /**
- * The forecast screen, mirroring the original WeatherChecker layout:
- *   - Pin icon + city name
- *   - Big current temperature
- *   - Big weather icon + description
- *   - Stats row (min, max, humidity, pressure, wind) — matches original
- *   - Multi-day forecast list (cards) with high/low/precip chance
+ * Forecast screen. Mirrors the original WeatherChecker layout:
+ * search bar pinned at the top, current weather + 14-day forecast below.
+ * Searching a new city replaces the content without leaving the screen.
  */
 @Composable
 fun ForecastScreen(
     data: WeatherData,
-    onBack: () -> Unit,
+    onSearch: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var cityInput by remember { mutableStateOf("") }
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        // "Search again" link
+        // Search bar pinned at the top — same as original layout
         item {
-            TextButton(onClick = onBack) {
-                Text(
-                    text = "← Search again",
-                    color = White,
-                    fontSize = 16.sp
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextField(
+                    value = cityInput,
+                    onValueChange = { cityInput = it },
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_search),
+                            contentDescription = "Search"
+                        )
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = White,
+                        unfocusedContainerColor = White,
+                        disabledContainerColor = White,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        focusedLeadingIconColor = Color.DarkGray,
+                        unfocusedLeadingIconColor = Color.DarkGray
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
                 )
+
+                TextButton(onClick = {
+                    onSearch(cityInput)
+                    cityInput = ""
+                }) {
+                    Text(
+                        text = "Go!",
+                        color = White,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
         }
 
-        // Current weather block (pin + city, big temp, big icon + description)
+        // Current weather block
         item {
             CurrentWeatherSection(current = data.current)
         }
 
-        // Divider
         item {
             HorizontalDivider(
                 color = White.copy(alpha = 0.5f),
@@ -74,12 +105,11 @@ fun ForecastScreen(
             )
         }
 
-        // Stats row (matches the original's 5-column layout)
+        // Stats row
         item {
             StatsRow(current = data.current)
         }
 
-        // Divider
         item {
             HorizontalDivider(
                 color = White.copy(alpha = 0.5f),
@@ -87,7 +117,6 @@ fun ForecastScreen(
             )
         }
 
-        // Section header
         item {
             Text(
                 text = "14-day forecast",
@@ -103,20 +132,15 @@ fun ForecastScreen(
             ForecastCard(item = item)
         }
 
-        // Bottom spacing so the last card isn't flush with the bottom edge
         item {
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
-/**
- * Top section: pin + city name, big temperature, big weather icon + description.
- */
 @Composable
 private fun CurrentWeatherSection(current: CurrentWeather) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        // Pin icon + city name
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -140,7 +164,6 @@ private fun CurrentWeatherSection(current: CurrentWeather) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Big temperature, centered
         Text(
             text = current.temp.asTempString(),
             color = White,
@@ -151,7 +174,6 @@ private fun CurrentWeatherSection(current: CurrentWeather) {
                 .wrapContentWidth(Alignment.CenterHorizontally)
         )
 
-        // Apparent (feels-like) temperature beneath
         Text(
             text = "Feels like ${current.apparentTemp.asTempString()}",
             color = White.copy(alpha = 0.85f),
@@ -163,7 +185,6 @@ private fun CurrentWeatherSection(current: CurrentWeather) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Big icon + condition description, centered
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -186,36 +207,17 @@ private fun CurrentWeatherSection(current: CurrentWeather) {
     }
 }
 
-/**
- * Stats row with 5 columns matching the original's layout:
- * Min temp ↓ | Max temp ↑ | Humidity 💧 | Pressure | Wind
- */
 @Composable
 private fun StatsRow(current: CurrentWeather) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        StatColumn(
-            iconRes = R.drawable.min,
-            value = current.tempMin.asTempString()
-        )
-        StatColumn(
-            iconRes = R.drawable.max,
-            value = current.tempMax.asTempString()
-        )
-        StatColumn(
-            iconRes = R.drawable.humidity,
-            value = "${current.humidity}%"
-        )
-        StatColumn(
-            iconRes = R.drawable.pressure,
-            value = "${current.pressure.toInt()} hPa"
-        )
-        StatColumn(
-            iconRes = R.drawable.wind,
-            value = "${current.windSpeed.toInt()} mph"
-        )
+        StatColumn(R.drawable.min, current.tempMin.asTempString())
+        StatColumn(R.drawable.max, current.tempMax.asTempString())
+        StatColumn(R.drawable.humidity, "${current.humidity}%")
+        StatColumn(R.drawable.pressure, "${current.pressure.toInt()} hPa")
+        StatColumn(R.drawable.wind, "${current.windSpeed.toInt()} mph")
     }
 }
 
@@ -236,14 +238,7 @@ private fun StatColumn(iconRes: Int, value: String) {
         )
     }
 }
-/**
- * One day in the multi-day forecast, rendered as a card.
- * Layout: [Day | Date]   [Icon + Description]   [💧 chance%]   [High / Low]
- *
- * Replaces list_item_forecast.xml + ForecastAdapter from the original.
- * Using a Card here gives each day a subtle visual border without breaking
- * the all-white-on-teal aesthetic.
- */
+
 @Composable
 private fun ForecastCard(item: ForecastItem) {
     Card(
@@ -260,7 +255,6 @@ private fun ForecastCard(item: ForecastItem) {
                 .padding(horizontal = 16.dp, vertical = 18.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Column 1: Day of week (e.g. "Mon")
             Text(
                 text = item.date.asDayOfWeek(),
                 color = White,
@@ -269,7 +263,6 @@ private fun ForecastCard(item: ForecastItem) {
                 modifier = Modifier.weight(1f)
             )
 
-            // Column 2: Date (e.g. "02 Mar")
             Text(
                 text = item.date.asShortDate(),
                 color = White,
@@ -277,7 +270,6 @@ private fun ForecastCard(item: ForecastItem) {
                 modifier = Modifier.weight(1f)
             )
 
-            // Column 3: Weather icon — centered in its own column
             Box(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center
@@ -289,7 +281,6 @@ private fun ForecastCard(item: ForecastItem) {
                 )
             }
 
-            // Column 4: High temperature (bold)
             Text(
                 text = item.tempMax.asTempString(),
                 color = White,
@@ -299,7 +290,6 @@ private fun ForecastCard(item: ForecastItem) {
                 modifier = Modifier.weight(1f)
             )
 
-            // Column 5: Low temperature
             Text(
                 text = item.tempMin.asTempString(),
                 color = White.copy(alpha = 0.75f),
@@ -311,9 +301,6 @@ private fun ForecastCard(item: ForecastItem) {
     }
 }
 
-/**
- * Centered loading spinner.
- */
 @Composable
 fun LoadingScreen(modifier: Modifier = Modifier) {
     Box(

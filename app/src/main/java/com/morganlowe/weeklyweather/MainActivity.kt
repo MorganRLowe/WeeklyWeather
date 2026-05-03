@@ -65,7 +65,7 @@ fun WeeklyWeatherApp(viewModel: WeatherViewModel) {
         is WeatherUiState.Success -> {
             ForecastScreen(
                 data = state.data,
-                onBack = { viewModel.resetState() }
+                onSearch = { city -> viewModel.searchWeather(city) }
             )
         }
         is WeatherUiState.Error -> {
