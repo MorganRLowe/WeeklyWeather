@@ -1,6 +1,6 @@
 # WeeklyWeather
 
-A Jetpack Compose reimplementation of an Android Views-based weather app. Built as a learning project demonstrating the migration of an XML/Fragment-based UI to modern Compose.
+A Jetpack Compose reimplementation of an Android Views-based weather app. 
 
 ## About
 
@@ -26,18 +26,6 @@ WeeklyWeather is inspired by [WeatherChecker](https://github.com/ersiver/Weather
 | Forecast length | 14 days | 14 days |
 | Visual style | Teal background, white icons | Same — kept faithful to the original |
 
-## Project structure
-
-```
-com.morganlowe.weeklyweather/
-├── MainActivity.kt          App entry point
-├── domain/                  Data models
-├── network/                 API + JSON parsing
-├── repository/              Bridges network and ViewModel
-├── viewmodel/               UI state management
-├── ui/                      Compose screens and theme
-└── util/                    Shared helpers
-```
 
 ## Tech stack
 
